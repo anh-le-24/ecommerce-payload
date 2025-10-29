@@ -1,6 +1,16 @@
 // storage-adapter-import-placeholder
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite' // database-adapter-import
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  BoldFeature,
+  EXPERIMENTAL_TableFeature,
+  IndentFeature,
+  ItalicFeature,
+  LinkFeature,
+  OrderedListFeature,
+  UnderlineFeature,
+  UnorderedListFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -10,6 +20,14 @@ import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+
+// ===== BỔ SUNG từ file mẫu =====
+import { Pages } from './collections/Pages'
+import { Categories } from './collections/Categories'
+import { Header } from './globals/Header'
+import { Footer } from './globals/Footer'
+import { plugins as projectPlugins } from './plugins'
+// Nếu bạn có bộ plugin chung, có thể bật thêm:
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,18 +44,50 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      beforeLogin: ['@/components/BeforeLogin#BeforeLogin'],
+    },
   },
-  collections: [Users, Media],
-  editor: lexicalEditor(),
+  collections: [Users, Pages, Categories, Media],
+  globals: [Header, Footer],
+  editor: lexicalEditor({
+    features: () => [
+      UnderlineFeature(),
+      BoldFeature(),
+      ItalicFeature(),
+      OrderedListFeature(),
+      UnorderedListFeature(),
+      LinkFeature({
+        enabledCollections: ['pages'],
+        fields: ({ defaultFields }) => {
+          const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
+            if ('name' in field && field.name === 'url') return false
+            return true
+          })
+          return [
+            ...defaultFieldsWithoutUrl,
+            {
+              name: 'url',
+              type: 'text',
+              admin: { condition: ({ linkType }) => linkType !== 'internal' },
+              label: ({ t }) => t('fields:enterURL'),
+              required: true,
+            },
+          ]
+        },
+      }),
+      IndentFeature(),
+      EXPERIMENTAL_TableFeature(),
+    ],
+  }),
+
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // database-adapter-config-start
   db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
-  // database-adapter-config-end
   plugins: [
-    // storage-adapter-placeholder
+    ...projectPlugins,
     r2Storage({
       bucket: cloudflare.env.R2,
       collections: { media: true },
