@@ -7,7 +7,7 @@ import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { ThreeItemGridBlock } from '@/blocks/ThreeItemGrid/Component'
 import { toKebabCase } from '@/utilities/toKebabCase'
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import type { Page } from '../payload-types'
 
@@ -29,30 +29,29 @@ export const RenderBlocks: React.FC<{
 
   const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
 
-  if (hasBlocks) {
-    return (
-      <Fragment>
-        {blocks.map((block, index) => {
-          const { blockName, blockType } = block
+  if (!hasBlocks) return null
 
-          if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
+  return (
+    <div className="flex flex-col gap-14 lg:gap-20">
+      {blocks.map((block, index) => {
+        const { blockName, blockType } = block
 
-            if (Block) {
-              return (
-                <div className="my-16" key={index}>
-                  {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                  {/* @ts-ignore - weird type mismatch here */}
-                  <Block id={toKebabCase(blockName!)} {...block} />
-                </div>
-              )
-            }
+        if (blockType && blockType in blockComponents) {
+          const Block = blockComponents[blockType]
+
+          if (Block) {
+            return (
+              <section className="scroll-mt-24" key={index}>
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore - weird type mismatch here */}
+                <Block id={toKebabCase(blockName!)} {...block} />
+              </section>
+            )
           }
-          return null
-        })}
-      </Fragment>
-    )
-  }
+        }
 
-  return null
+        return null
+      })}
+    </div>
+  )
 }

@@ -32,7 +32,8 @@ import { plugins as projectPlugins } from './plugins'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const cloudflareRemoteBindings = process.env.NODE_ENV === 'production'
+const cloudflareRemoteBindings =
+  process.env.NODE_ENV === 'production' || process.env.PAYLOAD_REMOTE_BINDINGS === 'true' // optional override to target remote bindings while developing
 const cloudflare =
   process.argv.find((value) => value.match(/^(generate|migrate):?/)) || !cloudflareRemoteBindings
     ? await getCloudflareContextFromWrangler()
@@ -85,7 +86,11 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+  db: sqliteD1Adapter({
+    binding: cloudflare.env.D1,
+    // avoid pushDevSchema running against remote D1 when developing with PAYLOAD_REMOTE_BINDINGS
+    push: process.env.PAYLOAD_REMOTE_BINDINGS === 'true' ? false : undefined,
+  }),
   plugins: [
     ...projectPlugins,
     r2Storage({

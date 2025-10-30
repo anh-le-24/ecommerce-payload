@@ -5,8 +5,10 @@ import type { PayloadAdminBarProps } from '@payloadcms/admin-bar'
 import { cn } from '@/utilities/cn'
 import { useSelectedLayoutSegments } from 'next/navigation'
 import { PayloadAdminBar } from '@payloadcms/admin-bar'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { User } from '@/payload-types'
+
+import { getClientSideURL } from '@/utilities/getURL'
 
 const collectionLabels = {
   pages: {
@@ -34,6 +36,10 @@ export const AdminBar: React.FC<{
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore - todo fix, not sure why this is erroring
   const collection = collectionLabels?.[segments?.[1]] ? segments?.[1] : 'pages'
+  const cmsURL = useMemo(
+    () => process.env.NEXT_PUBLIC_SERVER_URL || getClientSideURL(),
+    [],
+  )
 
   const onAuthChange = React.useCallback((user: User) => {
     const canSeeAdmin = user?.roles && Array.isArray(user?.roles) && user?.roles?.includes('admin')
@@ -57,7 +63,7 @@ export const AdminBar: React.FC<{
             logo: 'text-white',
             user: 'text-white',
           }}
-          cmsURL={process.env.NEXT_PUBLIC_SERVER_URL}
+          cmsURL={cmsURL}
           collectionLabels={{
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore - todo fix, not sure why this is erroring

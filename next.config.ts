@@ -1,8 +1,41 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 
+const mediaRemotePatterns: NonNullable<import('next').NextConfig['images']>['remotePatterns'] = [
+  {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '3000',
+    pathname: '/api/media/file/**',
+  },
+  {
+    protocol: 'http',
+    hostname: '127.0.0.1',
+    port: '3000',
+    pathname: '/api/media/file/**',
+  },
+]
+
+const payloadServerURL = process.env.PAYLOAD_PUBLIC_SERVER_URL
+
+if (payloadServerURL) {
+  try {
+    const { protocol, hostname, port } = new URL(payloadServerURL)
+    mediaRemotePatterns.push({
+      protocol: protocol.replace(':', '') as 'http' | 'https',
+      hostname,
+      port: port || undefined,
+      pathname: '/api/media/file/**',
+    })
+  } catch {
+    // ignore malformed env values
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Your Next.js config here
+  images: {
+    remotePatterns: mediaRemotePatterns,
+  },
   webpack: (webpackConfig: any) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

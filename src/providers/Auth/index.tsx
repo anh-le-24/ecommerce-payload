@@ -2,7 +2,9 @@
 
 import type { User } from '@/payload-types'
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+
+import { getClientSideURL } from '@/utilities/getURL'
 
 // eslint-disable-next-line no-unused-vars
 type ResetPassword = (args: {
@@ -34,13 +36,17 @@ const Context = createContext({} as AuthContext)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>()
+  const serverURL = useMemo(
+    () => process.env.NEXT_PUBLIC_SERVER_URL || getClientSideURL(),
+    [],
+  )
 
   // used to track the single event of logging in or logging out
   // useful for `useEffect` hooks that should only run once
   const [status, setStatus] = useState<'loggedIn' | 'loggedOut' | undefined>()
   const create = useCallback<Create>(async (args) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/create`, {
+      const res = await fetch(`${serverURL}/api/users/create`, {
         body: JSON.stringify({
           email: args.email,
           password: args.password,
@@ -64,11 +70,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       throw new Error('An error occurred while attempting to login.')
     }
-  }, [])
+  }, [serverURL])
 
   const login = useCallback<Login>(async (args) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/login`, {
+      const res = await fetch(`${serverURL}/api/users/login`, {
         body: JSON.stringify({
           email: args.email,
           password: args.password,
@@ -92,11 +98,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       throw new Error('An error occurred while attempting to login.')
     }
-  }, [])
+  }, [serverURL])
 
   const logout = useCallback<Logout>(async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/logout`, {
+      const res = await fetch(`${serverURL}/api/users/logout`, {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
@@ -113,12 +119,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       throw new Error('An error occurred while attempting to logout.')
     }
-  }, [])
+  }, [serverURL])
 
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/me`, {
+        const res = await fetch(`${serverURL}/api/users/me`, {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
@@ -140,11 +146,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     void fetchMe()
-  }, [])
+  }, [serverURL])
 
   const forgotPassword = useCallback<ForgotPassword>(async (args) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/forgot-password`, {
+      const res = await fetch(`${serverURL}/api/users/forgot-password`, {
         body: JSON.stringify({
           email: args.email,
         }),
@@ -165,11 +171,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       throw new Error('An error occurred while attempting to login.')
     }
-  }, [])
+  }, [serverURL])
 
   const resetPassword = useCallback<ResetPassword>(async (args) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/reset-password`, {
+      const res = await fetch(`${serverURL}/api/users/reset-password`, {
         body: JSON.stringify({
           password: args.password,
           passwordConfirm: args.passwordConfirm,
@@ -193,7 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       throw new Error('An error occurred while attempting to login.')
     }
-  }, [])
+  }, [serverURL])
 
   return (
     <Context.Provider
