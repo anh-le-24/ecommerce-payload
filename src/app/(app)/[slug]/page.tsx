@@ -5,14 +5,13 @@ import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { draftMode } from 'next/headers'
 import { homeStaticData } from '@/endpoints/seed/home-static'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
 import { notFound } from 'next/navigation'
 import { cn } from '@/utilities/cn'
-import { HomeLanding } from '../HomeLanding'
-import { queryPageBySlug } from '../utilities/queryPageBySlug'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -62,10 +61,6 @@ export default async function Page({ params }: Args) {
 
   const resolvedSlug = page.slug ?? slug
 
-  if (!slug || resolvedSlug === 'home') {
-    return <HomeLanding page={page} />
-  }
-
   const { hero, layout } = page
 
   const hasHero = hero && hero.type && hero.type !== 'none'
@@ -107,4 +102,30 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   })
 
   return generateMeta({ doc: page })
+}
+
+const queryPageBySlug = async ({ slug }: { slug: string }) => {
+  const { isEnabled: draft } = await draftMode()
+
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'pages',
+    draft,
+    limit: 1,
+    overrideAccess: draft,
+    pagination: false,
+    where: {
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        ...(draft ? [] : [{ _status: { equals: 'published' } }]),
+      ],
+    },
+  })
+
+  return result.docs?.[0] || null
 }

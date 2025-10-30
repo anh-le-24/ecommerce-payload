@@ -28,7 +28,8 @@ export const RenderHero: React.FC<Page['hero']> = (props) => {
 
   const className = cn(
     'relative overflow-hidden rounded-3xl border border-neutral-200/70 bg-white/95 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-neutral-800/60 dark:bg-neutral-900/80 dark:text-neutral-50',
-    type === 'mediumImpact' && 'bg-gradient-to-br from-slate-900 via-slate-800 to-neutral-900 text-white'
+    type === 'mediumImpact' &&
+      'bg-gradient-to-br from-slate-900 via-slate-800 to-neutral-900 text-white',
   )
 
   return (
@@ -37,7 +38,8 @@ export const RenderHero: React.FC<Page['hero']> = (props) => {
         aria-hidden
         className={cn(
           'pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700',
-          type === 'mediumImpact' && 'opacity-40 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_60%)]'
+          type === 'mediumImpact' &&
+            'opacity-40 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_60%)]',
         )}
       />
       <HeroToRender {...props} />

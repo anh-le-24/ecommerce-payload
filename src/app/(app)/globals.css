@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 @plugin "@tailwindcss/typography";
 @plugin "tailwindcss-animate";
@@ -166,7 +164,5 @@ html[data-theme='light'] {
 a,
 input,
 button {
-  outline: none;
+  @apply focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
 }
-
-
