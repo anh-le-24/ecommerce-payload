@@ -1,4 +1,7 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
 import { withPayload } from '@payloadcms/next/withPayload'
+
+initOpenNextCloudflareForDev()
 
 const mediaRemotePatterns: NonNullable<import('next').NextConfig['images']>['remotePatterns'] = [
   {

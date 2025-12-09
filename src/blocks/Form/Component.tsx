@@ -31,6 +31,16 @@ export type FormBlockType = {
   introContent?: SerializedEditorState
 }
 
+type FormSubmissionError = {
+  message?: string
+}
+
+type FormSubmissionResponse = {
+  errors?: FormSubmissionError[]
+  status?: string | number
+  [key: string]: unknown
+}
+
 export const FormBlock: React.FC<
   FormBlockType & {
     id?: DefaultDocumentIDType
@@ -86,7 +96,7 @@ export const FormBlock: React.FC<
             method: 'POST',
           })
 
-          const res = await req.json()
+          const res = (await req.json()) as FormSubmissionResponse
 
           clearTimeout(loadingTimerID)
 
@@ -95,7 +105,7 @@ export const FormBlock: React.FC<
 
             setError({
               message: res.errors?.[0]?.message || 'Internal Server Error',
-              status: res.status,
+              status: res.status?.toString() ?? req.status.toString(),
             })
 
             return

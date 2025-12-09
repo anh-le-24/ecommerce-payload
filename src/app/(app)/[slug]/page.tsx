@@ -6,7 +6,7 @@ import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import { homeStaticData } from '@/endpoints/seed/home-static'
+import { homeStaticData } from '@/data/homeStaticData'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
@@ -58,8 +58,6 @@ export default async function Page({ params }: Args) {
   if (!page) {
     return notFound()
   }
-
-  const resolvedSlug = page.slug ?? slug
 
   const { hero, layout } = page
 

@@ -20,6 +20,10 @@ type FormData = {
   passwordConfirm: string
 }
 
+type AccountUpdateResponse = {
+  doc: User
+}
+
 export const AccountForm: React.FC = () => {
   const { setUser, user } = useAuth()
   const [changePassword, setChangePassword] = useState(false)
@@ -51,7 +55,7 @@ export const AccountForm: React.FC = () => {
         })
 
         if (response.ok) {
-          const json = await response.json()
+          const json = (await response.json()) as AccountUpdateResponse
           setUser(json.doc)
           toast.success('Successfully updated account.')
           setChangePassword(false)

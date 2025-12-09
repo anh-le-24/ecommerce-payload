@@ -26,9 +26,9 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
   }, [api])
 
   useEffect(() => {
-    const values = searchParams.values().toArray()
+    const values = Array.from(searchParams.values())
 
-    if (values && api) {
+    if (values.length > 0 && api) {
       const index = gallery.findIndex((item) => {
         if (!item.variantOption) return false
 

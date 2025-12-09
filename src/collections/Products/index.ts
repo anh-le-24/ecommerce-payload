@@ -209,4 +209,9 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     },
     slugField(),
   ],
+  versions: {
+    drafts: {
+      autosave: false,
+    },
+  },
 })

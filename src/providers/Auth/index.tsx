@@ -21,6 +21,32 @@ type Login = (args: { email: string; password: string }) => Promise<User> // esl
 
 type Logout = () => Promise<void>
 
+type PayloadError = {
+  message?: string
+}
+
+type CreateUserResponse = {
+  data?: {
+    loginUser?: {
+      user?: User | null
+    }
+  }
+  errors?: PayloadError[]
+}
+
+type LoginResponse = {
+  user?: User | null
+  errors?: PayloadError[]
+}
+
+type ForgotPasswordResponse = CreateUserResponse
+
+type ResetPasswordResponse = CreateUserResponse
+
+type MeResponse = {
+  user?: User | null
+}
+
 type AuthContext = {
   create: Create
   forgotPassword: ForgotPassword
@@ -60,9 +86,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       if (res.ok) {
-        const { data, errors } = await res.json()
+        const { data, errors } = (await res.json()) as CreateUserResponse
         if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
+        setUser(data?.loginUser?.user || null)
         setStatus('loggedIn')
       } else {
         throw new Error('Invalid login')
@@ -87,8 +113,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       if (res.ok) {
-        const { errors, user } = await res.json()
+        const { errors, user } = (await res.json()) as LoginResponse
         if (errors) throw new Error(errors[0].message)
+        if (!user) throw new Error('Invalid login')
+
         setUser(user)
         setStatus('loggedIn')
         return user
@@ -133,7 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
 
         if (res.ok) {
-          const { user: meUser } = await res.json()
+          const { user: meUser } = (await res.json()) as MeResponse
           setUser(meUser || null)
           setStatus(meUser ? 'loggedIn' : undefined)
         } else {
@@ -162,9 +190,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       if (res.ok) {
-        const { data, errors } = await res.json()
+        const { data, errors } = (await res.json()) as ForgotPasswordResponse
         if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
+        setUser(data?.loginUser?.user || null)
       } else {
         throw new Error('Invalid login')
       }
@@ -189,9 +217,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       if (res.ok) {
-        const { data, errors } = await res.json()
+        const { data, errors } = (await res.json()) as ResetPasswordResponse
         if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
+        setUser(data?.loginUser?.user || null)
         setStatus(data?.loginUser?.user ? 'loggedIn' : undefined)
       } else {
         throw new Error('Invalid login')

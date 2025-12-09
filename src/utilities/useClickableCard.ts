@@ -96,11 +96,9 @@ export function useClickableCard<T extends HTMLElement>({
 
   return {
     card: {
-      // @ts-expect-error
       ref: card,
     },
     link: {
-      // @ts-expect-error
       ref: link,
     },
   }

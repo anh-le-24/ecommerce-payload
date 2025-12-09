@@ -21,46 +21,57 @@ export function HeaderClient({ header }: Props) {
   const pathname = usePathname()
 
   return (
-    <div className="relative z-20 border-b">
-      <nav className="flex items-center md:items-end justify-between container pt-2">
-        <div className="block flex-none md:hidden">
-          <Suspense fallback={null}>
-            <MobileMenu menu={menu} />
-          </Suspense>
-        </div>
-        <div className="flex w-full items-end justify-between">
-          <div className="flex w-full items-end gap-6 md:w-1/3">
-            <Link className="flex w-full items-center justify-center pt-4 pb-4 md:w-auto" href="/">
-              {/* <LogoIcon className="w-6 h-auto" /> */}
-            </Link>
-            {menu.length ? (
-              <ul className="hidden gap-4 text-sm md:flex md:items-center">
-                {menu.map((item) => (
-                  <li key={item.id}>
-                    <CMSLink
-                      {...item.link}
-                      size={'clear'}
-                      className={cn('relative navLink', {
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <nav className="container flex items-center justify-between gap-4 py-3 md:py-4">
+        <div className="flex flex-1 items-center gap-3 md:gap-6">
+          <div className="flex md:hidden">
+            <Suspense fallback={null}>
+              <MobileMenu menu={menu} />
+            </Suspense>
+          </div>
+
+          <Link
+            className="group flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/70 text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:shadow-md md:h-11 md:w-11"
+            href="/"
+            aria-label="Go to homepage"
+          >
+            <LogoIcon className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" />
+          </Link>
+
+          {menu.length ? (
+            <ul className="hidden items-center gap-1 rounded-full border border-transparent bg-white/50 p-1 text-sm font-medium text-slate-600 shadow-sm backdrop-blur transition hover:border-slate-200 md:flex">
+              {menu.map((item) => (
+                <li key={item.id}>
+                  <CMSLink
+                    {...item.link}
+                    size="clear"
+                    className={cn(
+                      'relative navLink inline-flex items-center rounded-full px-3 py-2 text-slate-600 transition-colors duration-200 hover:text-slate-900',
+                      {
                         active:
                           item.link.url && item.link.url !== '/'
                             ? pathname.includes(item.link.url)
                             : false,
-                      })}
-                      appearance="nav"
-                    />
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
+                        'text-slate-900':
+                          item.link.url && item.link.url !== '/'
+                            ? pathname.includes(item.link.url)
+                            : false,
+                      },
+                    )}
+                    appearance="nav"
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
 
-          <div className="flex justify-end md:w-1/3 gap-4">
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart />
-            </Suspense>
-          </div>
+        <div className="flex flex-none items-center justify-end gap-2 md:gap-4">
+          <Suspense fallback={<OpenCartButton />}>
+            <Cart />
+          </Suspense>
         </div>
       </nav>
-    </div>
+    </header>
   )
 }
